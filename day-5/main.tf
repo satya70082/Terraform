@@ -5,15 +5,23 @@ resource "aws_vpc" "local-vpc" {
     Name = "local-vpc"
   }
 }
-#subnet
-resource "aws_subnet" "local-subnet" {
+# public-subnet
+resource "aws_subnet" "public-subnet" {
   vpc_id = aws_vpc.local-vpc.id
-  cidr_block = "10.0.0.0/24"
+  cidr_block = "10.0.4.0/24"
   tags = {
-    Name = "local-subnet"
+    Name = "public-subnet"
   }
   
 } 
+#private-subnet
+resource "aws_subnet" "private-subnet" {
+  vpc_id = aws_vpc.local-vpc.id
+  cidr_block = "10.0.3.0/24"
+  tags = {
+    Name = "private-subnet"
+  }
+}
 #internet gateway
 resource "aws_internet_gateway" "local-igw" {
     vpc_id = aws_vpc.local-vpc.id
@@ -21,9 +29,23 @@ resource "aws_internet_gateway" "local-igw" {
       Name = "local-igw"
     }
 }
-  
+  #elastic ip
+resource "aws_eip" "lb" {
+  vpc = true
+  tags = {
+    Name = "lb"
+  }
+}
+#nat gateway
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.lb.id
+  subnet_id = aws_subnet.public-subnet.id
+  tags = {
+    Name = "nat"
+  }
+}
 
-#route table
+# public-route table
 resource "aws_route_table" "local-route" {
     vpc_id = aws_vpc.local-vpc.id  
     route {
@@ -35,10 +57,27 @@ resource "aws_route_table" "local-route" {
     }
     
 }
-#subnet association
+# private-route table
+resource "aws_route_table" "private-route" {
+    vpc_id = aws_vpc.local-vpc.id  
+    route {
+        cidr_block = "0.0.0.0/0"
+        nat_gateway_id = aws_nat_gateway.nat.id
+  
+}
+    tags = {
+      Name = "private-route"
+    }
+}
+# public-subnet association
 resource "aws_route_table_association" "local-rt" {
-  subnet_id = aws_subnet.local-subnet.id
+  subnet_id = aws_subnet.public-subnet.id
   route_table_id = aws_route_table.local-route.id
+}
+# private-subnet association
+resource "aws_route_table_association" "private-rt" {
+  subnet_id = aws_subnet.private-subnet.id
+  route_table_id = aws_route_table.private-route.id
 }
 #security group
 resource "aws_security_group" "sg" {
@@ -77,9 +116,9 @@ resource "aws_instance" "web" {
   ami = var.ami
   instance_type = var.instance_type
   key_name = var.key_name
-  subnet_id = aws_subnet.local-subnet.id
+  subnet_id = aws_subnet.private-subnet.id
   security_groups = [aws_security_group.sg.id]
-  associate_public_ip_address = "true"
+  associate_public_ip_address = "false"
   tags = {
     Name = "web-server"
   }
