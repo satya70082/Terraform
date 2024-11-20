@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "local-igw" {
 }
   #elastic ip
 resource "aws_eip" "lb" {
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "lb"
   }
