@@ -7,7 +7,7 @@ data "aws_subnet" "tester" {
     name = "tag:Name"
     values = ["dev"]
     }
-  
+    
 }
 #ami
 data "aws_ami" "amzlinux" {
