@@ -31,7 +31,7 @@ data "aws_ami" "amzlinux" {
   }
 }
 resource "aws_instance" "dev" {
-  ami ="ami-012967cc5a8c9f891"
+  ami = data.aws_ami.amzlinux.id
     instance_type = "t2.micro"
     key_name = "satyayt"
     subnet_id = data.aws_subnet.tester.id

@@ -5,3 +5,4 @@ module "dev" {
     key_name = "satyayt"
     availability_zone = "us-east-1a"
 }
+
