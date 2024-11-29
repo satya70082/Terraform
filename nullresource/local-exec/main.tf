@@ -6,7 +6,7 @@ resource "aws_security_group" "sg" {
   name        = "mysecuritygroup"
   description = "Allow inbound traffic"
   ingress {
-    from_port   = 0
+    from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # For testing; limit to specific IPs in production
@@ -64,14 +64,23 @@ resource "null_resource" "db_initializer" {
   depends_on = [aws_db_instance.rds]
 provisioner "local-exec" {
   command = <<EOT
-  mysql -h ${aws_db_instance.rds.address} -u admin -p'admin123' -e "source ./db.sql"
+  mysql -h ${aws_db_instance.rds.address} -u admin -padmin123 -e "source ./db.sql"
   EOT
 }
 
   
   
 }
-  
+  terraform {
+   backend "s3" {
+    bucket = "satyastatefil5276"
+    key = "terraform.tfstate"
+    region = "us-east-1"
+   # dynamodb_table = "terraform-state-lock-dynamo"
+    encrypt = true
+     
+   }
+ }
 
 
 
