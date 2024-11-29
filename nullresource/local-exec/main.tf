@@ -57,7 +57,7 @@ resource "aws_db_instance" "rds" {
 }
 resource "aws_db_subnet_group" "rds_subnet_group" {
   name       = "rds-subnet-group"
-  subnet_ids = ["subnet-038c77dfb92712301","subnet-0643b24c87e54fa25"]
+  subnet_ids = [data.aws_subnet.dev.id, data.aws_subnet.dev2.id]
 }
 
 resource "null_resource" "db_initializer" {

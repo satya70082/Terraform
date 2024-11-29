@@ -1,15 +1,13 @@
 
--- Switch to the target database
+CREATE DATABASE IF NOT EXISTS mydatabase;
 USE mydatabase;
 
--- Create a table for users
+-- Add your table creation and other SQL commands below
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
 );
-
 -- Create a table for orders
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
